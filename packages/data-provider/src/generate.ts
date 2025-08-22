@@ -79,6 +79,7 @@ export interface SettingDefinition {
   selectPlaceholder?: string; // Specific to combobox component
   searchPlaceholderCode?: boolean; // Specific to combobox component
   selectPlaceholderCode?: boolean; // Specific to combobox component
+  readonly?: boolean; // For parameters that should be read-only
 }
 
 export type DynamicSettingProps = Partial<SettingDefinition> & {

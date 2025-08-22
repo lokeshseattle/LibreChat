@@ -5,6 +5,7 @@ import {
   excludedKeys,
   paramSettings,
   getSettingsKeys,
+  getModelSettings,
   SettingDefinition,
   tConvoUpdateSchema,
 } from 'librechat-data-provider';
@@ -44,6 +45,7 @@ export default function Parameters() {
     const defaultParams = paramSettings[combinedKey] ?? paramSettings[overriddenEndpointKey] ?? [];
     const overriddenParams = endpointsConfig[provider]?.customParams?.paramDefinitions ?? [];
     const overriddenParamsMap = keyBy(overriddenParams, 'key');
+
     return defaultParams
       .filter((param) => param != null)
       .map((param) => (overriddenParamsMap[param.key] as SettingDefinition) ?? param);
@@ -102,6 +104,37 @@ export default function Parameters() {
       return updatedConversation;
     });
   }, [parameters, setConversation]);
+
+  // Auto-toggle web search based on model capabilities
+  useEffect(() => {
+    if (!conversation?.model || !endpointType) {
+      return;
+    }
+
+    const modelSettings = getModelSettings(endpointType, conversation.model);
+    const shouldEnableWebSearch =
+      'supportsWebSearch' in modelSettings ? modelSettings.supportsWebSearch : false;
+
+    setConversation((prev) => {
+      if (!prev) {
+        return prev;
+      }
+
+      // Only update if the current web_search state doesn't match the model's capability
+      if (prev.web_search !== shouldEnableWebSearch) {
+        logger.log(
+          'parameters',
+          'auto-toggling web search for model:',
+          conversation.model,
+          'to:',
+          shouldEnableWebSearch,
+        );
+        return { ...prev, web_search: shouldEnableWebSearch };
+      }
+
+      return prev;
+    });
+  }, [conversation?.model, endpointType, setConversation]);
 
   const resetParameters = useCallback(() => {
     setConversation((prev) => {

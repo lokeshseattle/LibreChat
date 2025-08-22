@@ -52,6 +52,50 @@ export enum BedrockProviders {
   DeepSeek = 'deepseek',
 }
 
+// OpenAI Model Categories for per-model settings
+export enum OpenAIModelCategory {
+  GPT5 = 'gpt-5',
+  GPT5Mini = 'gpt-5-mini',
+  GPT5Nano = 'gpt-5-nano',
+  GPT5ChatLatest = 'gpt-5-chat-latest',
+  GPT4o = 'gpt-4o',
+  ChatGPT4oLatest = 'chatgpt-4o-latest',
+  GPT4oMini = 'gpt-4o-mini',
+  Legacy = 'legacy',
+}
+
+export const getOpenAIModelCategory = (model: string): OpenAIModelCategory => {
+  const modelLower = model.toLowerCase();
+
+  // GPT-5 models
+  if (modelLower === 'gpt-5') {
+    return OpenAIModelCategory.GPT5;
+  }
+  if (modelLower === 'gpt-5-mini') {
+    return OpenAIModelCategory.GPT5Mini;
+  }
+  if (modelLower === 'gpt-5-nano') {
+    return OpenAIModelCategory.GPT5Nano;
+  }
+  if (modelLower === 'gpt-5-chat-latest') {
+    return OpenAIModelCategory.GPT5ChatLatest;
+  }
+
+  // GPT-4o models
+  if (modelLower === 'gpt-4o') {
+    return OpenAIModelCategory.GPT4o;
+  }
+  if (modelLower === 'chatgpt-4o-latest') {
+    return OpenAIModelCategory.ChatGPT4oLatest;
+  }
+  if (modelLower === 'gpt-4o-mini') {
+    return OpenAIModelCategory.GPT4oMini;
+  }
+
+  // Default to GPT-4o for unknown models
+  return OpenAIModelCategory.GPT4o;
+};
+
 export const getModelKey = (endpoint: EModelEndpoint | string, model: string) => {
   if (endpoint === EModelEndpoint.bedrock) {
     const parts = model.split('.');
@@ -60,6 +104,16 @@ export const getModelKey = (endpoint: EModelEndpoint | string, model: string) =>
     );
     return (provider ?? parts[0]) as BedrockProviders;
   }
+
+  // For OpenAI endpoints, return model category for per-model settings
+  if (
+    endpoint === EModelEndpoint.openAI ||
+    endpoint === EModelEndpoint.azureOpenAI ||
+    endpoint === EModelEndpoint.custom
+  ) {
+    return getOpenAIModelCategory(model);
+  }
+
   return model;
 };
 
@@ -249,6 +303,192 @@ export const openAISettings = {
     max: 2 as const,
     step: 1 as const,
   },
+};
+
+// Model-specific settings for OpenAI models
+// GPT-5 model settings
+export const gpt5Settings = {
+  ...openAISettings,
+  model: {
+    default: 'gpt-5' as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 2 as const,
+    step: 0.01 as const,
+    default: 0.6 as const,
+  },
+  max_tokens: {
+    min: 1 as const,
+    max: 32768 as const,
+    default: undefined,
+  },
+  supportsVision: true,
+  supportsFunctionCalling: true,
+  supportsWebSearch: true, // GPT-5 has web search
+  contextWindow: 200000,
+};
+
+export const gpt5MiniSettings = {
+  ...openAISettings,
+  model: {
+    default: 'gpt-5-mini' as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 2 as const,
+    step: 0.01 as const,
+    default: 0.6 as const,
+  },
+  max_tokens: {
+    min: 1 as const,
+    max: 16384 as const,
+    default: undefined,
+  },
+  supportsVision: true,
+  supportsFunctionCalling: true,
+  supportsWebSearch: true, // gpt-5-mini has web search
+  contextWindow: 128000,
+};
+
+export const gpt5NanoSettings = {
+  ...openAISettings,
+  model: {
+    default: 'gpt-5-nano' as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 2 as const,
+    step: 0.01 as const,
+    default: 0.6 as const,
+  },
+  max_tokens: {
+    min: 1 as const,
+    max: 8192 as const,
+    default: undefined,
+  },
+  supportsVision: false,
+  supportsFunctionCalling: true,
+  supportsWebSearch: false, // GPT-5-nano has NO web search
+  contextWindow: 64000,
+};
+
+export const gpt5ChatLatestSettings = {
+  ...openAISettings,
+  model: {
+    default: 'gpt-5-chat-latest' as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 2 as const,
+    step: 0.01 as const,
+    default: 0.7 as const,
+  },
+  max_tokens: {
+    min: 1 as const,
+    max: 32768 as const,
+    default: undefined,
+  },
+  supportsVision: true,
+  supportsFunctionCalling: false,
+  supportsWebSearch: false, // gpt-5-chat-latest has NO web search
+  contextWindow: 200000,
+};
+
+export const gpt4oSettings = {
+  ...openAISettings,
+  model: {
+    default: 'gpt-4o' as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 2 as const,
+    step: 0.01 as const,
+    default: 0.6 as const,
+  },
+  max_tokens: {
+    min: 1 as const,
+    max: 16384 as const,
+    default: undefined,
+  },
+  supportsVision: true,
+  supportsFunctionCalling: true,
+  supportsWebSearch: false, // gpt-4o has NO web search
+  contextWindow: 128000,
+};
+
+export const chatgpt4oLatestSettings = {
+  ...openAISettings,
+  model: {
+    default: 'chatgpt-4o-latest' as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 2 as const,
+    step: 0.01 as const,
+    default: 0.6 as const,
+  },
+  max_tokens: {
+    min: 1 as const,
+    max: 16384 as const,
+    default: undefined,
+  },
+  supportsVision: true,
+  supportsFunctionCalling: true,
+  supportsWebSearch: false, // chatgpt-4o-latest has NO web search
+  contextWindow: 128000,
+};
+
+export const gpt4oMiniSettings = {
+  ...openAISettings,
+  model: {
+    default: 'gpt-4o-mini' as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 2 as const,
+    step: 0.01 as const,
+    default: 0.6 as const,
+  },
+  max_tokens: {
+    min: 1 as const,
+    max: 16384 as const,
+    default: undefined,
+  },
+  supportsVision: true,
+  supportsFunctionCalling: true,
+  supportsWebSearch: false, // gpt-4o-mini has NO web search
+  contextWindow: 128000,
+};
+
+// Helper function to get model-specific settings
+export const getModelSettings = (endpoint: EModelEndpoint | string, model: string) => {
+  if (
+    endpoint === EModelEndpoint.openAI ||
+    endpoint === EModelEndpoint.azureOpenAI ||
+    endpoint === EModelEndpoint.custom
+  ) {
+    const category = getOpenAIModelCategory(model);
+    switch (category) {
+      case OpenAIModelCategory.GPT5:
+        return gpt5Settings;
+      case OpenAIModelCategory.GPT5Mini:
+        return gpt5MiniSettings;
+      case OpenAIModelCategory.GPT5Nano:
+        return gpt5NanoSettings;
+      case OpenAIModelCategory.GPT5ChatLatest:
+        return gpt5ChatLatestSettings;
+      case OpenAIModelCategory.GPT4o:
+        return gpt4oSettings;
+      case OpenAIModelCategory.ChatGPT4oLatest:
+        return chatgpt4oLatestSettings;
+      case OpenAIModelCategory.GPT4oMini:
+        return gpt4oMiniSettings;
+      default:
+        return openAISettings;
+    }
+  }
+  return openAISettings;
 };
 
 export const googleSettings = {
