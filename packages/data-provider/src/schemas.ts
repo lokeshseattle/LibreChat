@@ -64,6 +64,13 @@ export enum OpenAIModelCategory {
   Legacy = 'legacy',
 }
 
+// DeepSeek Model Categories for per-model settings
+export enum DeepSeekModelCategory {
+  DeepSeekChat = 'deepseek-chat',
+  DeepSeekCoder = 'deepseek-coder',
+  DeepSeekReasoner = 'deepseek-reasoner',
+}
+
 export const getOpenAIModelCategory = (model: string): OpenAIModelCategory => {
   const modelLower = model.toLowerCase();
 
@@ -96,6 +103,23 @@ export const getOpenAIModelCategory = (model: string): OpenAIModelCategory => {
   return OpenAIModelCategory.GPT4o;
 };
 
+export const getDeepSeekModelCategory = (model: string): DeepSeekModelCategory => {
+  const modelLower = model.toLowerCase();
+
+  if (modelLower === 'deepseek-chat') {
+    return DeepSeekModelCategory.DeepSeekChat;
+  }
+  if (modelLower === 'deepseek-coder') {
+    return DeepSeekModelCategory.DeepSeekCoder;
+  }
+  if (modelLower === 'deepseek-reasoner') {
+    return DeepSeekModelCategory.DeepSeekReasoner;
+  }
+
+  // Default to deepseek-chat for unknown models
+  return DeepSeekModelCategory.DeepSeekChat;
+};
+
 export const getModelKey = (endpoint: EModelEndpoint | string, model: string) => {
   if (endpoint === EModelEndpoint.bedrock) {
     const parts = model.split('.');
@@ -111,7 +135,16 @@ export const getModelKey = (endpoint: EModelEndpoint | string, model: string) =>
     endpoint === EModelEndpoint.azureOpenAI ||
     endpoint === EModelEndpoint.custom
   ) {
+    // Check if it's a DeepSeek model first
+    if (model.toLowerCase().includes('deepseek')) {
+      return getDeepSeekModelCategory(model);
+    }
     return getOpenAIModelCategory(model);
+  }
+
+  // For DeepSeek endpoint specifically
+  if (endpoint === 'deepseek') {
+    return getDeepSeekModelCategory(model);
   }
 
   return model;
@@ -142,6 +175,64 @@ export const isAgentsEndpoint = (_endpoint?: EModelEndpoint.agents | null | stri
     return false;
   }
   return endpoint === EModelEndpoint.agents;
+};
+
+// Type definition for model settings
+export type ModelSettings = {
+  model: {
+    default: string;
+  };
+  temperature?: {
+    min: number;
+    max: number;
+    step: number;
+    default: number;
+  };
+  top_p?: {
+    min: number;
+    max: number;
+    step: number;
+    default: number;
+  };
+  presence_penalty?: {
+    min: number;
+    max: number;
+    step: number;
+    default: number;
+  };
+  frequency_penalty?: {
+    min: number;
+    max: number;
+    step: number;
+    default: number;
+  };
+  resendFiles?: {
+    default: boolean;
+  };
+  maxContextTokens?: {
+    default: undefined;
+  };
+  max_tokens?: {
+    min?: number;
+    max?: number;
+    default: undefined;
+  };
+  maxOutputTokens?: {
+    min: number;
+    max: number;
+    step: number;
+    default: number;
+  };
+  imageDetail?: {
+    default: ImageDetail;
+    min: number;
+    max: number;
+    step: number;
+  };
+  supportsVision?: boolean;
+  supportsFunctionCalling?: boolean;
+  supportsWebSearch?: boolean;
+  contextWindow?: number;
 };
 
 export const isParamEndpoint = (
@@ -303,6 +394,10 @@ export const openAISettings = {
     max: 2 as const,
     step: 1 as const,
   },
+  supportsVision: false,
+  supportsFunctionCalling: false,
+  supportsWebSearch: false,
+  contextWindow: 4096,
 };
 
 // Model-specific settings for OpenAI models
@@ -461,13 +556,98 @@ export const gpt4oMiniSettings = {
   contextWindow: 128000,
 };
 
+// DeepSeek model settings
+export const deepSeekChatSettings = {
+  ...openAISettings,
+  model: {
+    default: 'deepseek-chat' as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 2 as const,
+    step: 0.01 as const,
+    default: 1 as const,
+  },
+  max_tokens: {
+    min: 1 as const,
+    max: 8192 as const,
+    default: undefined,
+  },
+  supportsVision: false,
+  supportsFunctionCalling: true,
+  supportsWebSearch: false, // DeepSeek models do not support web search
+  contextWindow: 32768,
+};
+
+export const deepSeekCoderSettings = {
+  ...openAISettings,
+  model: {
+    default: 'deepseek-coder' as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 2 as const,
+    step: 0.01 as const,
+    default: 1 as const,
+  },
+  max_tokens: {
+    min: 1 as const,
+    max: 8192 as const,
+    default: undefined,
+  },
+  supportsVision: false,
+  supportsFunctionCalling: true,
+  supportsWebSearch: false, // DeepSeek models do not support web search
+  contextWindow: 32768,
+};
+
+export const deepSeekReasonerSettings = {
+  ...openAISettings,
+  model: {
+    default: 'deepseek-reasoner' as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 2 as const,
+    step: 0.01 as const,
+    default: 1 as const,
+  },
+  max_tokens: {
+    min: 1 as const,
+    max: 8192 as const,
+    default: undefined,
+  },
+  supportsVision: false,
+  supportsFunctionCalling: true,
+  supportsWebSearch: false, // DeepSeek models do not support web search
+  contextWindow: 32768,
+};
+
 // Helper function to get model-specific settings
-export const getModelSettings = (endpoint: EModelEndpoint | string, model: string) => {
+export const getModelSettings = (
+  endpoint: EModelEndpoint | string,
+  model: string,
+): ModelSettings => {
   if (
     endpoint === EModelEndpoint.openAI ||
     endpoint === EModelEndpoint.azureOpenAI ||
     endpoint === EModelEndpoint.custom
   ) {
+    // Check if it's a DeepSeek model first
+    if (model.toLowerCase().includes('deepseek')) {
+      const category = getDeepSeekModelCategory(model);
+      switch (category) {
+        case DeepSeekModelCategory.DeepSeekChat:
+          return deepSeekChatSettings;
+        case DeepSeekModelCategory.DeepSeekCoder:
+          return deepSeekCoderSettings;
+        case DeepSeekModelCategory.DeepSeekReasoner:
+          return deepSeekReasonerSettings;
+        default:
+          return deepSeekChatSettings;
+      }
+    }
+
     const category = getOpenAIModelCategory(model);
     switch (category) {
       case OpenAIModelCategory.GPT5:
@@ -488,6 +668,42 @@ export const getModelSettings = (endpoint: EModelEndpoint | string, model: strin
         return openAISettings;
     }
   }
+
+  // For Anthropic endpoint
+  if (endpoint === EModelEndpoint.anthropic) {
+    return anthropicSettings;
+  }
+
+  // For Google endpoint
+  if (endpoint === EModelEndpoint.google) {
+    return googleSettings;
+  }
+
+  // For Agents endpoint
+  if (endpoint === EModelEndpoint.agents) {
+    return agentsSettings;
+  }
+
+  // For DeepSeek endpoint specifically
+  if (endpoint === 'deepseek') {
+    const category = getDeepSeekModelCategory(model);
+    switch (category) {
+      case DeepSeekModelCategory.DeepSeekChat:
+        return deepSeekChatSettings;
+      case DeepSeekModelCategory.DeepSeekCoder:
+        return deepSeekCoderSettings;
+      case DeepSeekModelCategory.DeepSeekReasoner:
+        return deepSeekReasonerSettings;
+      default:
+        return deepSeekChatSettings;
+    }
+  }
+
+  // Use endpointSettings mapping as fallback
+  if (endpoint in endpointSettings) {
+    return endpointSettings[endpoint as keyof typeof endpointSettings];
+  }
+
   return openAISettings;
 };
 
@@ -499,13 +715,13 @@ export const googleSettings = {
     min: 1 as const,
     max: 64000 as const,
     step: 1 as const,
-    default: 8192 as const,
+    default: 64000 as const,
   },
   temperature: {
     min: 0 as const,
     max: 2 as const,
     step: 0.01 as const,
-    default: 1 as const,
+    default: 0.7 as const,
   },
   topP: {
     min: 0 as const,
@@ -531,11 +747,16 @@ export const googleSettings = {
      */
     default: -1 as const,
   },
+  web_search: {
+    default: false as const,
+  },
+  supportsWebSearch: true,
 };
 
 const ANTHROPIC_MAX_OUTPUT = 128000 as const;
 const DEFAULT_MAX_OUTPUT = 8192 as const;
 const LEGACY_ANTHROPIC_MAX_OUTPUT = 4096 as const;
+
 export const anthropicSettings = {
   model: {
     default: 'claude-3-5-sonnet-latest' as const,
@@ -608,8 +829,9 @@ export const anthropicSettings = {
     },
   },
   web_search: {
-    default: false as const,
+    default: true as const,
   },
+  supportsWebSearch: true,
 };
 
 export const agentsSettings = {
@@ -651,6 +873,9 @@ export const agentsSettings = {
   },
   imageDetail: {
     default: ImageDetail.auto as const,
+    min: 0 as const,
+    max: 2 as const,
+    step: 1 as const,
   },
 };
 

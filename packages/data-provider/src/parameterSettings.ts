@@ -17,6 +17,12 @@ import {
   anthropicSettings,
   OpenAIModelCategory,
 } from './types';
+import {
+  DeepSeekModelCategory,
+  deepSeekChatSettings,
+  deepSeekCoderSettings,
+  deepSeekReasonerSettings,
+} from './schemas';
 import { SettingDefinition, SettingsConfiguration } from './generate';
 
 // Base definitions
@@ -526,6 +532,11 @@ export const gpt5ChatLatestParams = createModelParams(gpt5ChatLatestSettings);
 export const gpt4oParams = createModelParams(gpt4oSettings);
 export const chatgpt4oLatestParams = createModelParams(chatgpt4oLatestSettings);
 export const gpt4oMiniParams = createModelParams(gpt4oMiniSettings);
+
+// DeepSeek model-specific parameter definitions
+export const deepSeekChatParams = createModelParams(deepSeekChatSettings);
+export const deepSeekCoderParams = createModelParams(deepSeekCoderSettings);
+export const deepSeekReasonerParams = createModelParams(deepSeekReasonerSettings);
 
 const anthropic: Record<string, SettingDefinition> = {
   maxOutputTokens: {
@@ -1062,6 +1073,73 @@ const gpt4oMiniCol2: SettingsConfiguration = [
   gpt4oMiniParams.useResponsesApi,
   gpt4oMiniParams.web_search,
   gpt4oMiniParams.disableStreaming,
+];
+
+// DeepSeek column configurations
+const deepSeekChatCol1: SettingsConfiguration = [
+  baseDefinitions.model as SettingDefinition,
+  librechat.modelLabel,
+  librechat.promptPrefix,
+];
+
+const deepSeekChatCol2: SettingsConfiguration = [
+  librechat.maxContextTokens,
+  deepSeekChatParams.max_tokens,
+  deepSeekChatParams.temperature,
+  deepSeekChatParams.top_p,
+  deepSeekChatParams.frequency_penalty,
+  deepSeekChatParams.presence_penalty,
+  baseDefinitions.stop,
+  librechat.resendFiles,
+  deepSeekChatParams.reasoning_effort,
+  deepSeekChatParams.reasoning_summary,
+  deepSeekChatParams.verbosity,
+  deepSeekChatParams.useResponsesApi,
+  deepSeekChatParams.disableStreaming,
+];
+
+const deepSeekCoderCol1: SettingsConfiguration = [
+  baseDefinitions.model as SettingDefinition,
+  librechat.modelLabel,
+  librechat.promptPrefix,
+];
+
+const deepSeekCoderCol2: SettingsConfiguration = [
+  librechat.maxContextTokens,
+  deepSeekCoderParams.max_tokens,
+  deepSeekCoderParams.temperature,
+  deepSeekCoderParams.top_p,
+  deepSeekCoderParams.frequency_penalty,
+  deepSeekCoderParams.presence_penalty,
+  baseDefinitions.stop,
+  librechat.resendFiles,
+  deepSeekCoderParams.reasoning_effort,
+  deepSeekCoderParams.reasoning_summary,
+  deepSeekCoderParams.verbosity,
+  deepSeekCoderParams.useResponsesApi,
+  deepSeekCoderParams.disableStreaming,
+];
+
+const deepSeekReasonerCol1: SettingsConfiguration = [
+  baseDefinitions.model as SettingDefinition,
+  librechat.modelLabel,
+  librechat.promptPrefix,
+];
+
+const deepSeekReasonerCol2: SettingsConfiguration = [
+  librechat.maxContextTokens,
+  deepSeekReasonerParams.max_tokens,
+  deepSeekReasonerParams.temperature,
+  deepSeekReasonerParams.top_p,
+  deepSeekReasonerParams.frequency_penalty,
+  deepSeekReasonerParams.presence_penalty,
+  baseDefinitions.stop,
+  librechat.resendFiles,
+  deepSeekReasonerParams.reasoning_effort,
+  deepSeekReasonerParams.reasoning_summary,
+  deepSeekReasonerParams.verbosity,
+  deepSeekReasonerParams.useResponsesApi,
+  deepSeekReasonerParams.disableStreaming,
 ];
 
 const anthropicConfig: SettingsConfiguration = [
@@ -1617,6 +1695,116 @@ export const paramSettings: Record<string, SettingsConfiguration | undefined> = 
     gpt4oMiniParams.useResponsesApi,
     gpt4oMiniParams.disableStreaming,
   ],
+  // DeepSeek model-specific parameter settings for custom endpoint
+  [`${EModelEndpoint.custom}-${DeepSeekModelCategory.DeepSeekChat}`]: [
+    baseDefinitions.model as SettingDefinition,
+    deepSeekChatParams.chatGptLabel,
+    deepSeekChatParams.promptPrefix,
+    librechat.maxContextTokens,
+    deepSeekChatParams.max_tokens,
+    deepSeekChatParams.temperature,
+    deepSeekChatParams.top_p,
+    deepSeekChatParams.frequency_penalty,
+    deepSeekChatParams.presence_penalty,
+    baseDefinitions.stop,
+    librechat.resendFiles,
+    deepSeekChatParams.reasoning_effort,
+    deepSeekChatParams.reasoning_summary,
+    deepSeekChatParams.verbosity,
+    deepSeekChatParams.useResponsesApi,
+    deepSeekChatParams.disableStreaming,
+  ],
+  [`${EModelEndpoint.custom}-${DeepSeekModelCategory.DeepSeekCoder}`]: [
+    baseDefinitions.model as SettingDefinition,
+    deepSeekCoderParams.chatGptLabel,
+    deepSeekCoderParams.promptPrefix,
+    librechat.maxContextTokens,
+    deepSeekCoderParams.max_tokens,
+    deepSeekCoderParams.temperature,
+    deepSeekCoderParams.top_p,
+    deepSeekCoderParams.frequency_penalty,
+    deepSeekCoderParams.presence_penalty,
+    baseDefinitions.stop,
+    librechat.resendFiles,
+    deepSeekCoderParams.reasoning_effort,
+    deepSeekCoderParams.reasoning_summary,
+    deepSeekCoderParams.verbosity,
+    deepSeekCoderParams.useResponsesApi,
+    deepSeekCoderParams.disableStreaming,
+  ],
+  [`${EModelEndpoint.custom}-${DeepSeekModelCategory.DeepSeekReasoner}`]: [
+    baseDefinitions.model as SettingDefinition,
+    deepSeekReasonerParams.chatGptLabel,
+    deepSeekReasonerParams.promptPrefix,
+    librechat.maxContextTokens,
+    deepSeekReasonerParams.max_tokens,
+    deepSeekReasonerParams.temperature,
+    deepSeekReasonerParams.top_p,
+    deepSeekReasonerParams.frequency_penalty,
+    deepSeekReasonerParams.presence_penalty,
+    baseDefinitions.stop,
+    librechat.resendFiles,
+    deepSeekReasonerParams.reasoning_effort,
+    deepSeekReasonerParams.reasoning_summary,
+    deepSeekReasonerParams.verbosity,
+    deepSeekReasonerParams.useResponsesApi,
+    deepSeekReasonerParams.disableStreaming,
+  ],
+  // DeepSeek endpoint specific configurations
+  [`deepseek-${DeepSeekModelCategory.DeepSeekChat}`]: [
+    baseDefinitions.model as SettingDefinition,
+    deepSeekChatParams.chatGptLabel,
+    deepSeekChatParams.promptPrefix,
+    librechat.maxContextTokens,
+    deepSeekChatParams.max_tokens,
+    deepSeekChatParams.temperature,
+    deepSeekChatParams.top_p,
+    deepSeekChatParams.frequency_penalty,
+    deepSeekChatParams.presence_penalty,
+    baseDefinitions.stop,
+    librechat.resendFiles,
+    deepSeekChatParams.reasoning_effort,
+    deepSeekChatParams.reasoning_summary,
+    deepSeekChatParams.verbosity,
+    deepSeekChatParams.useResponsesApi,
+    deepSeekChatParams.disableStreaming,
+  ],
+  [`deepseek-${DeepSeekModelCategory.DeepSeekCoder}`]: [
+    baseDefinitions.model as SettingDefinition,
+    deepSeekCoderParams.chatGptLabel,
+    deepSeekCoderParams.promptPrefix,
+    librechat.maxContextTokens,
+    deepSeekCoderParams.max_tokens,
+    deepSeekCoderParams.temperature,
+    deepSeekCoderParams.top_p,
+    deepSeekCoderParams.frequency_penalty,
+    deepSeekCoderParams.presence_penalty,
+    baseDefinitions.stop,
+    librechat.resendFiles,
+    deepSeekCoderParams.reasoning_effort,
+    deepSeekCoderParams.reasoning_summary,
+    deepSeekCoderParams.verbosity,
+    deepSeekCoderParams.useResponsesApi,
+    deepSeekCoderParams.disableStreaming,
+  ],
+  [`deepseek-${DeepSeekModelCategory.DeepSeekReasoner}`]: [
+    baseDefinitions.model as SettingDefinition,
+    deepSeekReasonerParams.chatGptLabel,
+    deepSeekReasonerParams.promptPrefix,
+    librechat.maxContextTokens,
+    deepSeekReasonerParams.max_tokens,
+    deepSeekReasonerParams.temperature,
+    deepSeekReasonerParams.top_p,
+    deepSeekReasonerParams.frequency_penalty,
+    deepSeekReasonerParams.presence_penalty,
+    baseDefinitions.stop,
+    librechat.resendFiles,
+    deepSeekReasonerParams.reasoning_effort,
+    deepSeekReasonerParams.reasoning_summary,
+    deepSeekReasonerParams.verbosity,
+    deepSeekReasonerParams.useResponsesApi,
+    deepSeekReasonerParams.disableStreaming,
+  ],
   [EModelEndpoint.anthropic]: anthropicConfig,
   [`${EModelEndpoint.bedrock}-${BedrockProviders.Anthropic}`]: bedrockAnthropic,
   [`${EModelEndpoint.bedrock}-${BedrockProviders.MistralAI}`]: bedrockMistral,
@@ -1669,6 +1857,22 @@ const gpt4oMiniColumns = {
   col2: gpt4oMiniCol2,
 };
 
+// DeepSeek column configurations
+const deepSeekChatColumns = {
+  col1: deepSeekChatCol1,
+  col2: deepSeekChatCol2,
+};
+
+const deepSeekCoderColumns = {
+  col1: deepSeekCoderCol1,
+  col2: deepSeekCoderCol2,
+};
+
+const deepSeekReasonerColumns = {
+  col1: deepSeekReasonerCol1,
+  col2: deepSeekReasonerCol2,
+};
+
 const bedrockGeneralColumns = {
   col1: bedrockGeneralCol1,
   col2: bedrockGeneralCol2,
@@ -1709,6 +1913,14 @@ export const presetSettings: Record<
   [`${EModelEndpoint.custom}-${OpenAIModelCategory.GPT4o}`]: gpt4oColumns,
   [`${EModelEndpoint.custom}-${OpenAIModelCategory.ChatGPT4oLatest}`]: chatgpt4oLatestColumns,
   [`${EModelEndpoint.custom}-${OpenAIModelCategory.GPT4oMini}`]: gpt4oMiniColumns,
+  // DeepSeek model-specific settings for custom endpoint
+  [`${EModelEndpoint.custom}-${DeepSeekModelCategory.DeepSeekChat}`]: deepSeekChatColumns,
+  [`${EModelEndpoint.custom}-${DeepSeekModelCategory.DeepSeekCoder}`]: deepSeekCoderColumns,
+  [`${EModelEndpoint.custom}-${DeepSeekModelCategory.DeepSeekReasoner}`]: deepSeekReasonerColumns,
+  // DeepSeek endpoint specific configurations
+  [`deepseek-${DeepSeekModelCategory.DeepSeekChat}`]: deepSeekChatColumns,
+  [`deepseek-${DeepSeekModelCategory.DeepSeekCoder}`]: deepSeekCoderColumns,
+  [`deepseek-${DeepSeekModelCategory.DeepSeekReasoner}`]: deepSeekReasonerColumns,
   [EModelEndpoint.anthropic]: {
     col1: anthropicCol1,
     col2: anthropicCol2,

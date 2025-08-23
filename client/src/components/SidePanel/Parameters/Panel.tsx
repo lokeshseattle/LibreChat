@@ -107,34 +107,42 @@ export default function Parameters() {
 
   // Auto-toggle web search based on model capabilities
   useEffect(() => {
-    if (!conversation?.model || !endpointType) {
+    if (!conversation?.model || !endpointType || !parameters) {
       return;
     }
 
     const modelSettings = getModelSettings(endpointType, conversation.model);
     const shouldEnableWebSearch =
-      'supportsWebSearch' in modelSettings ? modelSettings.supportsWebSearch : false;
+      'supportsWebSearch' in modelSettings ? Boolean(modelSettings.supportsWebSearch) : false;
 
-    setConversation((prev) => {
-      if (!prev) {
-        return prev;
-      }
+    // Check if web_search is in the parameters for this model
+    const hasWebSearchParam = parameters.some((param) => param.key === 'web_search');
 
-      // Only update if the current web_search state doesn't match the model's capability
-      if (prev.web_search !== shouldEnableWebSearch) {
-        logger.log(
-          'parameters',
-          'auto-toggling web search for model:',
-          conversation.model,
-          'to:',
-          shouldEnableWebSearch,
-        );
-        return { ...prev, web_search: shouldEnableWebSearch };
-      }
+    // Convert undefined to false for proper comparison
+    const currentWebSearch = conversation.web_search ?? false;
 
-      return prev;
-    });
-  }, [conversation?.model, endpointType, setConversation]);
+    // Only update if the current web_search state doesn't match the model's capability
+    // and if the model supports web search or has web_search parameter
+    if (
+      currentWebSearch !== shouldEnableWebSearch &&
+      (shouldEnableWebSearch || hasWebSearchParam)
+    ) {
+      logger.log(
+        'parameters',
+        'auto-toggling web search for model:',
+        conversation.model,
+        'from:',
+        currentWebSearch,
+        'to:',
+        shouldEnableWebSearch,
+        'hasWebSearchParam:',
+        hasWebSearchParam,
+      );
+
+      // Use setOption to trigger the same logic as manual toggle
+      setOption('web_search')(shouldEnableWebSearch);
+    }
+  }, [conversation?.model, conversation?.web_search, endpointType, parameters, setOption]);
 
   const resetParameters = useCallback(() => {
     setConversation((prev) => {

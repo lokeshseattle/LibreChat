@@ -9,6 +9,7 @@ import {
   ArtifactModes,
   PermissionTypes,
   defaultAgentCapabilities,
+  getModelSettings,
 } from 'librechat-data-provider';
 import { useLocalize, useHasAccess, useAgentCapabilities, useMCPSelect } from '~/hooks';
 import ArtifactsSubMenu from '~/components/Chat/Input/ArtifactsSubMenu';
@@ -33,6 +34,8 @@ const ToolsDropdown = ({ disabled }: ToolsDropdownProps) => {
     codeApiKeyForm,
     codeInterpreter,
     searchApiKeyForm,
+    endpoint,
+    model,
   } = useBadgeRowContext();
   const mcpSelect = useMCPSelect();
   const { data: startupConfig } = useGetStartupConfig();
@@ -127,6 +130,20 @@ const ToolsDropdown = ({ disabled }: ToolsDropdownProps) => {
   }, [artifacts]);
 
   const mcpPlaceholder = startupConfig?.interface?.mcpServers?.placeholder;
+
+  // Check if current model supports function calling for MCP
+  const modelSupportsFunctionCalling = useMemo(() => {
+    if (!endpoint || !model) {
+      return false;
+    }
+    try {
+      const modelSettings = getModelSettings(endpoint, model);
+      return modelSettings.supportsFunctionCalling === true;
+    } catch (error) {
+      console.warn('Error getting model settings:', error);
+      return false;
+    }
+  }, [endpoint, model]);
 
   const dropdownItems: MenuItemProps[] = [];
 
@@ -287,7 +304,7 @@ const ToolsDropdown = ({ disabled }: ToolsDropdownProps) => {
     });
   }
 
-  if (mcpServerNames && mcpServerNames.length > 0) {
+  if (mcpServerNames && mcpServerNames.length > 0 && modelSupportsFunctionCalling) {
     dropdownItems.push({
       hideOnClick: false,
       render: (props) => <MCPSubMenu {...props} placeholder={mcpPlaceholder} />,

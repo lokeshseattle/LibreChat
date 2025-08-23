@@ -8,6 +8,8 @@ import { ephemeralAgentByConvoId } from '~/store';
 interface BadgeRowContextType {
   conversationId?: string | null;
   agentsConfig?: TAgentsEndpoint | null;
+  endpoint?: string | null;
+  model?: string | null;
   webSearch: ReturnType<typeof useToolToggle>;
   artifacts: ReturnType<typeof useToolToggle>;
   fileSearch: ReturnType<typeof useToolToggle>;
@@ -30,12 +32,16 @@ interface BadgeRowProviderProps {
   children: React.ReactNode;
   isSubmitting?: boolean;
   conversationId?: string | null;
+  endpoint?: string | null;
+  model?: string | null;
 }
 
 export default function BadgeRowProvider({
   children,
   isSubmitting,
   conversationId,
+  endpoint,
+  model,
 }: BadgeRowProviderProps) {
   const hasInitializedRef = useRef(false);
   const lastKeyRef = useRef<string>('');
@@ -162,6 +168,8 @@ export default function BadgeRowProvider({
     fileSearch,
     agentsConfig,
     conversationId,
+    endpoint,
+    model,
     codeApiKeyForm,
     codeInterpreter,
     searchApiKeyForm,
