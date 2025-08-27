@@ -53,6 +53,7 @@ export default function Parameters() {
 
   useEffect(() => {
     if (!parameters) {
+      logger.error('parameters', 'No parameters found');
       return;
     }
 
@@ -100,6 +101,7 @@ export default function Parameters() {
       });
 
       logger.log('parameters', 'parameters effect, updated keys:', updatedKeys);
+      logger.log('parameters', 'parameters effect, updated conversation:', parameters);
 
       return updatedConversation;
     });
@@ -107,11 +109,24 @@ export default function Parameters() {
 
   // Auto-toggle web search based on model capabilities
   useEffect(() => {
-    if (!conversation?.model || !endpointType || !parameters) {
+    if (!conversation?.model || !conversation.endpoint || !parameters) {
+      logger.log('parameters', 'no model or endpoint type found', {
+        conversation,
+        endpointType,
+        parameters,
+      });
       return;
     }
 
-    const modelSettings = getModelSettings(endpointType, conversation.model);
+    logger.log(
+      'parameters',
+      'checking auto-toggle web search for model:',
+      conversation.model,
+      'and endpoint:',
+      conversation.endpoint,
+    );
+
+    const modelSettings = getModelSettings(conversation.endpoint, conversation.model);
     const shouldEnableWebSearch =
       'supportsWebSearch' in modelSettings ? Boolean(modelSettings.supportsWebSearch) : false;
 
@@ -141,8 +156,23 @@ export default function Parameters() {
 
       // Use setOption to trigger the same logic as manual toggle
       setOption('web_search')(shouldEnableWebSearch);
+    } else {
+      logger.log(
+        'parameters',
+        'not toggling web search for model:',
+        conversation.model,
+        'current state matches model capability.',
+        'hasWebSearchParam:',
+        hasWebSearchParam,
+        'current state:',
+        currentWebSearch,
+        'should enable:',
+        shouldEnableWebSearch,
+        'modelSettings:',
+        modelSettings,
+      );
     }
-  }, [conversation?.model, conversation?.web_search, endpointType, parameters, setOption]);
+  }, [conversation, endpointType, parameters, setOption]);
 
   const resetParameters = useCallback(() => {
     setConversation((prev) => {

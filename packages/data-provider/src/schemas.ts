@@ -71,6 +71,16 @@ export enum DeepSeekModelCategory {
   DeepSeekReasoner = 'deepseek-reasoner',
 }
 
+// Claude Model Categories for per-model settings
+export enum ClaudeModelCategory {
+  ClaudeOpus4_1 = 'claude-opus-4-1-20250805',
+  ClaudeOpus4 = 'claude-opus-4-20250514',
+  ClaudeSonnet4 = 'claude-sonnet-4-20250514',
+  Claude3_7Sonnet = 'claude-3-7-sonnet-20250219',
+  Claude3_5Sonnet = 'claude-3-5-sonnet-20241022',
+  Claude3Haiku = 'claude-3-haiku-20240307',
+}
+
 export const getOpenAIModelCategory = (model: string): OpenAIModelCategory => {
   const modelLower = model.toLowerCase();
 
@@ -120,6 +130,36 @@ export const getDeepSeekModelCategory = (model: string): DeepSeekModelCategory =
   return DeepSeekModelCategory.DeepSeekChat;
 };
 
+export const getClaudeModelCategory = (model: string): ClaudeModelCategory => {
+  const modelLower = model.toLowerCase();
+
+  if (modelLower.includes('claude-opus-4-1') || modelLower.includes('claude-opus-4.1')) {
+    return ClaudeModelCategory.ClaudeOpus4_1;
+  }
+  if (
+    modelLower.includes('claude-opus-4') &&
+    !modelLower.includes('4-1') &&
+    !modelLower.includes('4.1')
+  ) {
+    return ClaudeModelCategory.ClaudeOpus4;
+  }
+  if (modelLower.includes('claude-sonnet-4') || modelLower.includes('claude-4-sonnet')) {
+    return ClaudeModelCategory.ClaudeSonnet4;
+  }
+  if (modelLower.includes('claude-3-7-sonnet') || modelLower.includes('claude-3.7-sonnet')) {
+    return ClaudeModelCategory.Claude3_7Sonnet;
+  }
+  if (modelLower.includes('claude-3-5-sonnet') || modelLower.includes('claude-3.5-sonnet')) {
+    return ClaudeModelCategory.Claude3_5Sonnet;
+  }
+  if (modelLower.includes('claude-3-haiku') || modelLower.includes('claude-3.0-haiku')) {
+    return ClaudeModelCategory.Claude3Haiku;
+  }
+
+  // Default to Claude 3.5 Sonnet for unknown models
+  return ClaudeModelCategory.Claude3_5Sonnet;
+};
+
 export const getModelKey = (endpoint: EModelEndpoint | string, model: string) => {
   if (endpoint === EModelEndpoint.bedrock) {
     const parts = model.split('.');
@@ -145,6 +185,11 @@ export const getModelKey = (endpoint: EModelEndpoint | string, model: string) =>
   // For DeepSeek endpoint specifically
   if (endpoint === 'deepseek') {
     return getDeepSeekModelCategory(model);
+  }
+
+  // For Anthropic endpoint, return model category for per-model settings
+  if (endpoint === EModelEndpoint.anthropic) {
+    return getClaudeModelCategory(model);
   }
 
   return model;
@@ -671,7 +716,23 @@ export const getModelSettings = (
 
   // For Anthropic endpoint
   if (endpoint === EModelEndpoint.anthropic) {
-    return anthropicSettings;
+    const category = getClaudeModelCategory(model);
+    switch (category) {
+      case ClaudeModelCategory.ClaudeOpus4_1:
+        return claudeOpus4_1Settings;
+      case ClaudeModelCategory.ClaudeOpus4:
+        return claudeOpus4Settings;
+      case ClaudeModelCategory.ClaudeSonnet4:
+        return claudeSonnet4Settings;
+      case ClaudeModelCategory.Claude3_7Sonnet:
+        return claude3_7SonnetSettings;
+      case ClaudeModelCategory.Claude3_5Sonnet:
+        return claude3_5SonnetSettings;
+      case ClaudeModelCategory.Claude3Haiku:
+        return claude3HaikuSettings;
+      default:
+        return anthropicSettings;
+    }
   }
 
   // For Google endpoint
@@ -832,6 +893,205 @@ export const anthropicSettings = {
     default: true as const,
   },
   supportsWebSearch: true,
+};
+
+// Claude model-specific settings
+export const claudeOpus4_1Settings = {
+  ...anthropicSettings,
+  model: {
+    default: 'claude-opus-4-1-20250805' as const,
+  },
+  maxOutputTokens: {
+    min: 1 as const,
+    max: 128000 as const,
+    step: 1 as const,
+    default: 8192 as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 1 as const,
+    step: 0.01 as const,
+    default: 0.7 as const,
+  },
+  promptCache: {
+    default: true as const,
+  },
+  thinking: {
+    default: true as const,
+  },
+  thinkingBudget: {
+    min: 1024 as const,
+    step: 100 as const,
+    max: 200000 as const,
+    default: 2000 as const,
+  },
+  supportsWebSearch: true,
+  contextWindow: 200000,
+};
+
+export const claudeOpus4Settings = {
+  ...anthropicSettings,
+  model: {
+    default: 'claude-opus-4-20250514' as const,
+  },
+  maxOutputTokens: {
+    min: 1 as const,
+    max: 128000 as const,
+    step: 1 as const,
+    default: 8192 as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 1 as const,
+    step: 0.01 as const,
+    default: 0.7 as const,
+  },
+  promptCache: {
+    default: true as const,
+  },
+  thinking: {
+    default: true as const,
+  },
+  thinkingBudget: {
+    min: 1024 as const,
+    step: 100 as const,
+    max: 200000 as const,
+    default: 2000 as const,
+  },
+  supportsWebSearch: true,
+  contextWindow: 200000,
+};
+
+export const claudeSonnet4Settings = {
+  ...anthropicSettings,
+  model: {
+    default: 'claude-sonnet-4-20250514' as const,
+  },
+  maxOutputTokens: {
+    min: 1 as const,
+    max: 128000 as const,
+    step: 1 as const,
+    default: 8192 as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 1 as const,
+    step: 0.01 as const,
+    default: 0.7 as const,
+  },
+  promptCache: {
+    default: true as const,
+  },
+  thinking: {
+    default: true as const,
+  },
+  thinkingBudget: {
+    min: 1024 as const,
+    step: 100 as const,
+    max: 200000 as const,
+    default: 2000 as const,
+  },
+  supportsWebSearch: true,
+  contextWindow: 200000,
+};
+
+export const claude3_7SonnetSettings = {
+  ...anthropicSettings,
+  model: {
+    default: 'claude-3-7-sonnet-20250219' as const,
+  },
+  maxOutputTokens: {
+    min: 1 as const,
+    max: 128000 as const,
+    step: 1 as const,
+    default: 8192 as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 1 as const,
+    step: 0.01 as const,
+    default: 0.7 as const,
+  },
+  promptCache: {
+    default: true as const,
+  },
+  thinking: {
+    default: true as const,
+  },
+  thinkingBudget: {
+    min: 1024 as const,
+    step: 100 as const,
+    max: 200000 as const,
+    default: 2000 as const,
+  },
+  supportsWebSearch: true,
+  contextWindow: 200000,
+};
+
+export const claude3_5SonnetSettings = {
+  ...anthropicSettings,
+  model: {
+    default: 'claude-3-5-sonnet-20241022' as const,
+  },
+  maxOutputTokens: {
+    min: 1 as const,
+    max: 128000 as const,
+    step: 1 as const,
+    default: 8192 as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 1 as const,
+    step: 0.01 as const,
+    default: 0.7 as const,
+  },
+  promptCache: {
+    default: true as const,
+  },
+  thinking: {
+    default: true as const,
+  },
+  thinkingBudget: {
+    min: 1024 as const,
+    step: 100 as const,
+    max: 200000 as const,
+    default: 2000 as const,
+  },
+  supportsWebSearch: true,
+  contextWindow: 200000,
+};
+
+export const claude3HaikuSettings = {
+  ...anthropicSettings,
+  model: {
+    default: 'claude-3-haiku-20240307' as const,
+  },
+  maxOutputTokens: {
+    min: 1 as const,
+    max: 4096 as const,
+    step: 1 as const,
+    default: 4096 as const,
+  },
+  temperature: {
+    min: 0 as const,
+    max: 1 as const,
+    step: 0.01 as const,
+    default: 0.7 as const,
+  },
+  promptCache: {
+    default: true as const,
+  },
+  thinking: {
+    default: false as const, // Haiku doesn't support thinking
+  },
+  thinkingBudget: {
+    min: 1024 as const,
+    step: 100 as const,
+    max: 200000 as const,
+    default: 2000 as const,
+  },
+  supportsWebSearch: false,
+  contextWindow: 200000,
 };
 
 export const agentsSettings = {

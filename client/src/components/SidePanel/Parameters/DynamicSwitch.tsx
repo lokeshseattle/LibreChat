@@ -34,7 +34,10 @@ function DynamicSwitch({
 
   const selectedValue = conversation?.[settingKey] ?? defaultValue;
 
+  console.log(`Dynamic switch ${settingKey}`, selectedValue);
+
   const handleCheckedChange = (checked: boolean) => {
+    console.log(`Switch ${settingKey} changed to`, checked);
     setInputValue(checked);
     setOption(settingKey)(checked);
   };

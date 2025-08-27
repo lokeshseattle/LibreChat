@@ -10,6 +10,7 @@ import type { TSetExample, TSetOption, TSetOptionsPayload } from '~/common';
 import usePresetIndexOptions from './usePresetIndexOptions';
 import { useChatContext } from '~/Providers/ChatContext';
 import store from '~/store';
+import { logger } from '~/utils';
 
 type TUseSetOptions = (preset?: TPreset | boolean | null) => TSetOptionsPayload;
 
@@ -25,6 +26,7 @@ const useSetIndexOptions: TUseSetOptions = (preset = false) => {
   }
 
   const setOption: TSetOption = (param) => (newValue) => {
+    console.log(`setOption ${param}`, newValue);
     const update = {};
     update[param] = newValue;
 
@@ -38,6 +40,7 @@ const useSetIndexOptions: TUseSetOptions = (preset = false) => {
 
     // Auto-enable Responses API when web search is enabled (only for OpenAI/Azure/Custom endpoints)
     if (param === 'web_search' && newValue === true) {
+      logger.debug('setOption', 'Auto-enabling Responses API');
       const currentEndpoint = conversation?.endpoint;
       const isOpenAICompatible =
         currentEndpoint === EModelEndpoint.openAI ||

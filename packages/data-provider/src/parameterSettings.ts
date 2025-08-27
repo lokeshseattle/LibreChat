@@ -22,6 +22,13 @@ import {
   deepSeekChatSettings,
   deepSeekCoderSettings,
   deepSeekReasonerSettings,
+  ClaudeModelCategory,
+  claudeOpus4_1Settings,
+  claudeOpus4Settings,
+  claudeSonnet4Settings,
+  claude3_7SonnetSettings,
+  claude3_5SonnetSettings,
+  claude3HaikuSettings,
 } from './schemas';
 import { SettingDefinition, SettingsConfiguration } from './generate';
 
@@ -537,6 +544,125 @@ export const gpt4oMiniParams = createModelParams(gpt4oMiniSettings);
 export const deepSeekChatParams = createModelParams(deepSeekChatSettings);
 export const deepSeekCoderParams = createModelParams(deepSeekCoderSettings);
 export const deepSeekReasonerParams = createModelParams(deepSeekReasonerSettings);
+
+// Helper function to create Claude-specific parameters
+const createClaudeParams = (settings: any): Record<string, SettingDefinition> => ({
+  maxOutputTokens: {
+    key: 'maxOutputTokens',
+    label: 'com_endpoint_max_output_tokens',
+    labelCode: true,
+    type: 'number',
+    component: 'input',
+    description: 'com_endpoint_anthropic_maxoutputtokens',
+    descriptionCode: true,
+    placeholder: 'com_nav_theme_system',
+    placeholderCode: true,
+    range: {
+      min: settings.maxOutputTokens.min,
+      max: settings.maxOutputTokens.max,
+      step: settings.maxOutputTokens.step,
+    },
+    optionType: 'model',
+    columnSpan: 2,
+  },
+  temperature: createDefinition(baseDefinitions.temperature, {
+    default: settings.temperature.default,
+    range: {
+      min: settings.temperature.min,
+      max: settings.temperature.max,
+      step: settings.temperature.step,
+    },
+  }),
+  topP: createDefinition(baseDefinitions.topP, {
+    default: settings.topP.default,
+    range: {
+      min: settings.topP.min,
+      max: settings.topP.max,
+      step: settings.topP.step,
+    },
+  }),
+  topK: {
+    key: 'topK',
+    label: 'com_endpoint_top_k',
+    labelCode: true,
+    description: 'com_endpoint_anthropic_topk',
+    descriptionCode: true,
+    type: 'number',
+    default: settings.topK.default,
+    range: {
+      min: settings.topK.min,
+      max: settings.topK.max,
+      step: settings.topK.step,
+    },
+    component: 'slider',
+    optionType: 'model',
+    columnSpan: 4,
+  },
+  promptCache: {
+    key: 'promptCache',
+    label: 'com_endpoint_prompt_cache',
+    labelCode: true,
+    description: 'com_endpoint_anthropic_prompt_cache',
+    descriptionCode: true,
+    type: 'boolean',
+    default: settings.promptCache.default,
+    component: 'switch',
+    optionType: 'conversation',
+    showDefault: false,
+    columnSpan: 2,
+  },
+  thinking: {
+    key: 'thinking',
+    label: 'com_endpoint_thinking',
+    labelCode: true,
+    description: 'com_endpoint_anthropic_thinking',
+    descriptionCode: true,
+    type: 'boolean',
+    default: settings.thinking.default,
+    component: 'switch',
+    optionType: 'conversation',
+    showDefault: false,
+    columnSpan: 2,
+  },
+  thinkingBudget: {
+    key: 'thinkingBudget',
+    label: 'com_endpoint_thinking_budget',
+    labelCode: true,
+    description: 'com_endpoint_anthropic_thinking_budget',
+    descriptionCode: true,
+    type: 'number',
+    component: 'input',
+    default: settings.thinkingBudget.default,
+    range: {
+      min: settings.thinkingBudget.min,
+      max: settings.thinkingBudget.max,
+      step: settings.thinkingBudget.step,
+    },
+    optionType: 'conversation',
+    columnSpan: 2,
+  },
+  web_search: {
+    key: 'web_search',
+    label: 'com_ui_web_search',
+    labelCode: true,
+    description: 'com_endpoint_anthropic_use_web_search',
+    descriptionCode: true,
+    type: 'boolean',
+    default: settings.supportsWebSearch ?? false,
+    component: 'switch',
+    optionType: 'model',
+    showDefault: false,
+    columnSpan: 2,
+  },
+});
+
+// Claude model-specific parameter definitions
+export const claudeOpus4_1Params = createClaudeParams(claudeOpus4_1Settings);
+export const claudeOpus4Params = createClaudeParams(claudeOpus4Settings);
+export const claudeSonnet4Params = createClaudeParams(claudeSonnet4Settings);
+export const claude3_7SonnetParams = createClaudeParams(claude3_7SonnetSettings);
+export const claude3_5SonnetParams = createClaudeParams(claude3_5SonnetSettings);
+export const claude3HaikuParams = createClaudeParams(claude3HaikuSettings);
 
 const anthropic: Record<string, SettingDefinition> = {
   maxOutputTokens: {
@@ -1176,6 +1302,127 @@ const anthropicCol2: SettingsConfiguration = [
   anthropic.web_search,
 ];
 
+// Claude model-specific column configurations
+const claudeOpus4_1Col1: SettingsConfiguration = [
+  baseDefinitions.model as SettingDefinition,
+  librechat.modelLabel,
+  librechat.promptPrefix,
+];
+
+const claudeOpus4_1Col2: SettingsConfiguration = [
+  librechat.maxContextTokens,
+  claudeOpus4_1Params.maxOutputTokens,
+  claudeOpus4_1Params.temperature,
+  claudeOpus4_1Params.topP,
+  claudeOpus4_1Params.topK,
+  baseDefinitions.stop,
+  librechat.resendFiles,
+  claudeOpus4_1Params.promptCache,
+  claudeOpus4_1Params.thinking,
+  claudeOpus4_1Params.thinkingBudget,
+  claudeOpus4_1Params.web_search,
+];
+
+const claudeOpus4Col1: SettingsConfiguration = [
+  baseDefinitions.model as SettingDefinition,
+  librechat.modelLabel,
+  librechat.promptPrefix,
+];
+
+const claudeOpus4Col2: SettingsConfiguration = [
+  librechat.maxContextTokens,
+  claudeOpus4Params.maxOutputTokens,
+  claudeOpus4Params.temperature,
+  claudeOpus4Params.topP,
+  claudeOpus4Params.topK,
+  baseDefinitions.stop,
+  librechat.resendFiles,
+  claudeOpus4Params.promptCache,
+  claudeOpus4Params.thinking,
+  claudeOpus4Params.thinkingBudget,
+  claudeOpus4Params.web_search,
+];
+
+const claudeSonnet4Col1: SettingsConfiguration = [
+  baseDefinitions.model as SettingDefinition,
+  librechat.modelLabel,
+  librechat.promptPrefix,
+];
+
+const claudeSonnet4Col2: SettingsConfiguration = [
+  librechat.maxContextTokens,
+  claudeSonnet4Params.maxOutputTokens,
+  claudeSonnet4Params.temperature,
+  claudeSonnet4Params.topP,
+  claudeSonnet4Params.topK,
+  baseDefinitions.stop,
+  librechat.resendFiles,
+  claudeSonnet4Params.promptCache,
+  claudeSonnet4Params.thinking,
+  claudeSonnet4Params.thinkingBudget,
+  claudeSonnet4Params.web_search,
+];
+
+const claude3_7SonnetCol1: SettingsConfiguration = [
+  baseDefinitions.model as SettingDefinition,
+  librechat.modelLabel,
+  librechat.promptPrefix,
+];
+
+const claude3_7SonnetCol2: SettingsConfiguration = [
+  librechat.maxContextTokens,
+  claude3_7SonnetParams.maxOutputTokens,
+  claude3_7SonnetParams.temperature,
+  claude3_7SonnetParams.topP,
+  claude3_7SonnetParams.topK,
+  baseDefinitions.stop,
+  librechat.resendFiles,
+  claude3_7SonnetParams.promptCache,
+  claude3_7SonnetParams.thinking,
+  claude3_7SonnetParams.thinkingBudget,
+  claude3_7SonnetParams.web_search,
+];
+
+const claude3_5SonnetCol1: SettingsConfiguration = [
+  baseDefinitions.model as SettingDefinition,
+  librechat.modelLabel,
+  librechat.promptPrefix,
+];
+
+const claude3_5SonnetCol2: SettingsConfiguration = [
+  librechat.maxContextTokens,
+  claude3_5SonnetParams.maxOutputTokens,
+  claude3_5SonnetParams.temperature,
+  claude3_5SonnetParams.topP,
+  claude3_5SonnetParams.topK,
+  baseDefinitions.stop,
+  librechat.resendFiles,
+  claude3_5SonnetParams.promptCache,
+  claude3_5SonnetParams.thinking,
+  claude3_5SonnetParams.thinkingBudget,
+  claude3_5SonnetParams.web_search,
+];
+
+const claude3HaikuCol1: SettingsConfiguration = [
+  baseDefinitions.model as SettingDefinition,
+  librechat.modelLabel,
+  librechat.promptPrefix,
+];
+
+const claude3HaikuCol2: SettingsConfiguration = [
+  librechat.maxContextTokens,
+  claude3HaikuParams.maxOutputTokens,
+  claude3HaikuParams.temperature,
+  claude3HaikuParams.topP,
+  claude3HaikuParams.topK,
+  baseDefinitions.stop,
+  librechat.resendFiles,
+  claude3HaikuParams.promptCache,
+  claude3HaikuParams.thinking,
+  claude3HaikuParams.thinkingBudget,
+  claude3HaikuParams.web_search,
+];
+
 const bedrockAnthropic: SettingsConfiguration = [
   librechat.modelLabel,
   bedrock.system,
@@ -1805,6 +2052,85 @@ export const paramSettings: Record<string, SettingsConfiguration | undefined> = 
     deepSeekReasonerParams.useResponsesApi,
     deepSeekReasonerParams.disableStreaming,
   ],
+  // Claude model-specific parameter settings for anthropic endpoint
+  [`${EModelEndpoint.anthropic}-${ClaudeModelCategory.ClaudeOpus4_1}`]: [
+    baseDefinitions.model as SettingDefinition,
+    claudeOpus4_1Params.maxOutputTokens,
+    claudeOpus4_1Params.temperature,
+    claudeOpus4_1Params.topP,
+    claudeOpus4_1Params.topK,
+    baseDefinitions.stop,
+    librechat.resendFiles,
+    claudeOpus4_1Params.promptCache,
+    claudeOpus4_1Params.thinking,
+    claudeOpus4_1Params.thinkingBudget,
+    claudeOpus4_1Params.web_search,
+  ],
+  [`${EModelEndpoint.anthropic}-${ClaudeModelCategory.ClaudeOpus4}`]: [
+    baseDefinitions.model as SettingDefinition,
+    claudeOpus4Params.maxOutputTokens,
+    claudeOpus4Params.temperature,
+    claudeOpus4Params.topP,
+    claudeOpus4Params.topK,
+    baseDefinitions.stop,
+    librechat.resendFiles,
+    claudeOpus4Params.promptCache,
+    claudeOpus4Params.thinking,
+    claudeOpus4Params.thinkingBudget,
+    claudeOpus4Params.web_search,
+  ],
+  [`${EModelEndpoint.anthropic}-${ClaudeModelCategory.ClaudeSonnet4}`]: [
+    baseDefinitions.model as SettingDefinition,
+    claudeSonnet4Params.maxOutputTokens,
+    claudeSonnet4Params.temperature,
+    claudeSonnet4Params.topP,
+    claudeSonnet4Params.topK,
+    baseDefinitions.stop,
+    librechat.resendFiles,
+    claudeSonnet4Params.promptCache,
+    claudeSonnet4Params.thinking,
+    claudeSonnet4Params.thinkingBudget,
+    claudeSonnet4Params.web_search,
+  ],
+  [`${EModelEndpoint.anthropic}-${ClaudeModelCategory.Claude3_7Sonnet}`]: [
+    baseDefinitions.model as SettingDefinition,
+    claude3_7SonnetParams.maxOutputTokens,
+    claude3_7SonnetParams.temperature,
+    claude3_7SonnetParams.topP,
+    claude3_7SonnetParams.topK,
+    baseDefinitions.stop,
+    librechat.resendFiles,
+    claude3_7SonnetParams.promptCache,
+    claude3_7SonnetParams.thinking,
+    claude3_7SonnetParams.thinkingBudget,
+    claude3_7SonnetParams.web_search,
+  ],
+  [`${EModelEndpoint.anthropic}-${ClaudeModelCategory.Claude3_5Sonnet}`]: [
+    baseDefinitions.model as SettingDefinition,
+    claude3_5SonnetParams.maxOutputTokens,
+    claude3_5SonnetParams.temperature,
+    claude3_5SonnetParams.topP,
+    claude3_5SonnetParams.topK,
+    baseDefinitions.stop,
+    librechat.resendFiles,
+    claude3_5SonnetParams.promptCache,
+    claude3_5SonnetParams.thinking,
+    claude3_5SonnetParams.thinkingBudget,
+    claude3_5SonnetParams.web_search,
+  ],
+  [`${EModelEndpoint.anthropic}-${ClaudeModelCategory.Claude3Haiku}`]: [
+    baseDefinitions.model as SettingDefinition,
+    claude3HaikuParams.maxOutputTokens,
+    claude3HaikuParams.temperature,
+    claude3HaikuParams.topP,
+    claude3HaikuParams.topK,
+    baseDefinitions.stop,
+    librechat.resendFiles,
+    claude3HaikuParams.promptCache,
+    claude3HaikuParams.thinking,
+    claude3HaikuParams.thinkingBudget,
+    claude3HaikuParams.web_search,
+  ],
   [EModelEndpoint.anthropic]: anthropicConfig,
   [`${EModelEndpoint.bedrock}-${BedrockProviders.Anthropic}`]: bedrockAnthropic,
   [`${EModelEndpoint.bedrock}-${BedrockProviders.MistralAI}`]: bedrockMistral,
@@ -1873,6 +2199,37 @@ const deepSeekReasonerColumns = {
   col2: deepSeekReasonerCol2,
 };
 
+// Claude model-specific column configurations
+const claudeOpus4_1Columns = {
+  col1: claudeOpus4_1Col1,
+  col2: claudeOpus4_1Col2,
+};
+
+const claudeOpus4Columns = {
+  col1: claudeOpus4Col1,
+  col2: claudeOpus4Col2,
+};
+
+const claudeSonnet4Columns = {
+  col1: claudeSonnet4Col1,
+  col2: claudeSonnet4Col2,
+};
+
+const claude3_7SonnetColumns = {
+  col1: claude3_7SonnetCol1,
+  col2: claude3_7SonnetCol2,
+};
+
+const claude3_5SonnetColumns = {
+  col1: claude3_5SonnetCol1,
+  col2: claude3_5SonnetCol2,
+};
+
+const claude3HaikuColumns = {
+  col1: claude3HaikuCol1,
+  col2: claude3HaikuCol2,
+};
+
 const bedrockGeneralColumns = {
   col1: bedrockGeneralCol1,
   col2: bedrockGeneralCol2,
@@ -1921,6 +2278,13 @@ export const presetSettings: Record<
   [`deepseek-${DeepSeekModelCategory.DeepSeekChat}`]: deepSeekChatColumns,
   [`deepseek-${DeepSeekModelCategory.DeepSeekCoder}`]: deepSeekCoderColumns,
   [`deepseek-${DeepSeekModelCategory.DeepSeekReasoner}`]: deepSeekReasonerColumns,
+  // Claude model-specific settings for anthropic endpoint
+  [`${EModelEndpoint.anthropic}-${ClaudeModelCategory.ClaudeOpus4_1}`]: claudeOpus4_1Columns,
+  [`${EModelEndpoint.anthropic}-${ClaudeModelCategory.ClaudeOpus4}`]: claudeOpus4Columns,
+  [`${EModelEndpoint.anthropic}-${ClaudeModelCategory.ClaudeSonnet4}`]: claudeSonnet4Columns,
+  [`${EModelEndpoint.anthropic}-${ClaudeModelCategory.Claude3_7Sonnet}`]: claude3_7SonnetColumns,
+  [`${EModelEndpoint.anthropic}-${ClaudeModelCategory.Claude3_5Sonnet}`]: claude3_5SonnetColumns,
+  [`${EModelEndpoint.anthropic}-${ClaudeModelCategory.Claude3Haiku}`]: claude3HaikuColumns,
   [EModelEndpoint.anthropic]: {
     col1: anthropicCol1,
     col2: anthropicCol2,
