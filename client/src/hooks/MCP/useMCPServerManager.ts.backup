@@ -63,6 +63,18 @@ export function useMCPServerManager() {
 
   const lastAutoSelectAttemptRef = useRef<string | null>(null); // fixes the issue where OAuth flows would deselect all the servers except the one that is being authenticated on success
 
+  useEffect(() => {
+    const previousValues = mcpValuesRef.current ?? [];
+
+    const currentValues = mcpValues ?? []; // If web-search was manually deselected, reset the auto-select attempt tracking
+
+    if (previousValues.includes('web-search') && !currentValues.includes('web-search')) {
+      lastAutoSelectAttemptRef.current = null;
+    }
+
+    mcpValuesRef.current = mcpValues;
+  }, [mcpValues]);
+
   const configuredServers = useMemo(() => {
     if (!startupConfig?.mcpServers) return [];
 
@@ -130,21 +142,6 @@ export function useMCPServerManager() {
 
     [connectionStatusData?.connectionStatus],
   );
-
-  const connectionStatusRef = useRef(connectionStatus);
-
-  useEffect(() => {
-    const previousValues = mcpValuesRef.current ?? [];
-
-    const currentValues = mcpValues ?? []; // If web-search was manually deselected, reset the auto-select attempt tracking
-
-    if (previousValues.includes('web-search') && !currentValues.includes('web-search')) {
-      lastAutoSelectAttemptRef.current = null;
-    }
-
-    mcpValuesRef.current = mcpValues;
-    connectionStatusRef.current = connectionStatus;
-  }, [mcpValues, connectionStatus]);
 
   useEffect(() => {
     if (!mcpValues?.length) return;
@@ -462,7 +459,7 @@ export function useMCPServerManager() {
           return;
         }
 
-        const serverStatus = connectionStatusRef.current['web-search']; // Only auto-select if the server is connected or can be connected
+        const serverStatus = connectionStatus['web-search']; // Only auto-select if the server is connected or can be connected
 
         if (serverStatus?.connectionState === 'connected') {
           lastAutoSelectAttemptRef.current = modelKey;
@@ -475,19 +472,12 @@ export function useMCPServerManager() {
 
           initializeServer('web-search', false); // false = don't auto-open OAuth
         }
-      }
-      // If model supports web search and web-search server is selected, auto-deselect it
-      // since the model has native web search capabilities
-      else if (modelSupportsWebSearch && isWebSearchSelected) {
-        // Only auto-deselect if this was previously auto-selected for a model without web search
-        // This prevents deselecting if user manually selected it for a web-search capable model
-        if (lastAutoSelectAttemptRef.current && lastAutoSelectAttemptRef.current !== modelKey) {
-          const filteredValues = currentMcpValues.filter((name) => name !== 'web-search');
-          setMCPValues(filteredValues);
-          // Reset the auto-select attempt tracking since we're switching to a web-search capable model
-          lastAutoSelectAttemptRef.current = null;
-        }
-      }
+      } // If model supports web search and web-search server is selected, optionally deselect it
+      // (commented out to avoid unexpected behavior - user might want to keep it selected)
+      // else if (modelSupportsWebSearch && isWebSearchSelected) {
+      //   const filteredValues = (mcpValues ?? []).filter((name) => name !== 'web-search');
+      //   setMCPValues(filteredValues);
+      // }
     } catch (error) {
       console.error('[MCP Manager] Error checking model web search support:', error);
     }

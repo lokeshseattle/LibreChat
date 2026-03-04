@@ -770,7 +770,7 @@ export const getModelSettings = (
 
 export const googleSettings = {
   model: {
-    default: 'gemini-1.5-flash-latest' as const,
+    default: 'gemini-2.5-pro' as const,
   },
   maxOutputTokens: {
     min: 1 as const,
@@ -905,7 +905,7 @@ export const claudeOpus4_1Settings = {
     min: 1 as const,
     max: 128000 as const,
     step: 1 as const,
-    default: 8192 as const,
+    default: 60000 as const,
   },
   temperature: {
     min: 0 as const,
@@ -923,7 +923,7 @@ export const claudeOpus4_1Settings = {
     min: 1024 as const,
     step: 100 as const,
     max: 200000 as const,
-    default: 2000 as const,
+    default: 30000 as const,
   },
   supportsWebSearch: true,
   contextWindow: 200000,

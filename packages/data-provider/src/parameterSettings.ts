@@ -1945,7 +1945,6 @@ export const paramSettings: Record<string, SettingsConfiguration | undefined> = 
   // DeepSeek model-specific parameter settings for custom endpoint
   [`${EModelEndpoint.custom}-${DeepSeekModelCategory.DeepSeekChat}`]: [
     baseDefinitions.model as SettingDefinition,
-    deepSeekChatParams.chatGptLabel,
     deepSeekChatParams.promptPrefix,
     librechat.maxContextTokens,
     deepSeekChatParams.max_tokens,
@@ -1955,14 +1954,10 @@ export const paramSettings: Record<string, SettingsConfiguration | undefined> = 
     deepSeekChatParams.presence_penalty,
     baseDefinitions.stop,
     librechat.resendFiles,
-    deepSeekChatParams.reasoning_effort,
-    deepSeekChatParams.reasoning_summary,
     deepSeekChatParams.verbosity,
-    deepSeekChatParams.useResponsesApi,
-    deepSeekChatParams.disableStreaming,
   ],
   [`${EModelEndpoint.custom}-${DeepSeekModelCategory.DeepSeekCoder}`]: [
-    baseDefinitions.model as SettingDefinition,
+    baseDefinitions.moel as SettingDefinition,
     deepSeekCoderParams.chatGptLabel,
     deepSeekCoderParams.promptPrefix,
     librechat.maxContextTokens,
@@ -1981,7 +1976,6 @@ export const paramSettings: Record<string, SettingsConfiguration | undefined> = 
   ],
   [`${EModelEndpoint.custom}-${DeepSeekModelCategory.DeepSeekReasoner}`]: [
     baseDefinitions.model as SettingDefinition,
-    deepSeekReasonerParams.chatGptLabel,
     deepSeekReasonerParams.promptPrefix,
     librechat.maxContextTokens,
     deepSeekReasonerParams.max_tokens,
@@ -1994,8 +1988,6 @@ export const paramSettings: Record<string, SettingsConfiguration | undefined> = 
     deepSeekReasonerParams.reasoning_effort,
     deepSeekReasonerParams.reasoning_summary,
     deepSeekReasonerParams.verbosity,
-    deepSeekReasonerParams.useResponsesApi,
-    deepSeekReasonerParams.disableStreaming,
   ],
   // DeepSeek endpoint specific configurations
   [`deepseek-${DeepSeekModelCategory.DeepSeekChat}`]: [

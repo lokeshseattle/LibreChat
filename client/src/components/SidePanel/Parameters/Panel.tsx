@@ -46,6 +46,9 @@ export default function Parameters() {
     const overriddenParams = endpointsConfig[provider]?.customParams?.paramDefinitions ?? [];
     const overriddenParamsMap = keyBy(overriddenParams, 'key');
 
+    console.log('combinedKey', 'endpointKey:', combinedKey, endpointKey, model);
+    console.log('defaultParams', 'overriddenParams:', defaultParams, overriddenParams);
+
     return defaultParams
       .filter((param) => param != null)
       .map((param) => (overriddenParamsMap[param.key] as SettingDefinition) ?? param);
@@ -66,6 +69,7 @@ export default function Parameters() {
     //     return setting.key;
     //   }),
     // );
+
     const paramKeys = new Set(
       parameters.filter((setting) => setting != null).map((setting) => setting.key),
     );
